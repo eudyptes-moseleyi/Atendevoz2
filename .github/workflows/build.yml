@@ -1,4 +1,4 @@
-name: Compilar APK
+name: Build APK
 on:
   push:
   workflow_dispatch:
@@ -7,19 +7,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: unzip -q AtendeVoz.zip -d proj
+      - run: mkdir proj && unzip -q CadernoEstudo.zip -d proj
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
-      - name: Aceitar licencas do Android
-        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.7
-      - run: gradle assembleDebug
-        working-directory: proj/AtendeVoz
+      - name: Aceitar licenças do SDK
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+      - name: Compilar
+        working-directory: proj/CadernoEstudo
+        run: gradle assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
-          name: AtendeVoz-apk
-          path: proj/AtendeVoz/app/build/outputs/apk/debug/app-debug.apk
+          name: CadernoEstudo-apk
+          path: proj/CadernoEstudo/app/build/outputs/apk/debug/*.apk
